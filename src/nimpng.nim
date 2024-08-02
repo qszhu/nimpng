@@ -77,13 +77,13 @@ proc open*(fn: string): PNGImage =
         else:
           raise newException(ValueError, "Unsupported color type: " & $c.colorType)
       of "IDAT":
-        dataStream.writeData(addr(chunk.IDATChunk.data[0]), chunk.IDATChunk.data.len)
+        dataStream.writeData(chunk.IDATChunk.data[0].addr, chunk.IDATChunk.data.len)
       else:
-        discard
         # echo (chunk.chunkType, chunk.length)
+        discard
 
     dataStream.setPosition(0)
-    result.defilter(inflate(dataStream))
+    result.defilter(inflate(newStreamInputStream(dataStream)))
 
   finally:
     fs.close
